@@ -1,45 +1,44 @@
 
 #include <ncurses.h>
 
-WINDOW *create_newwin(int height, int width, int starty, int startx);
 void destroy_win(WINDOW *local_win);
 
 int main(int argc, char *argv[])
 {
-    WINDOW *win_commu;
-    WINDOW *win_state;
-    WINDOW *win_input;
+    initscr();
+    cbreak();
     
-    int ch;
+    int row,col;
+    getmaxyx(stdscr, row, col);
 
-    initscr();          /* Start curses mode        */
-    cbreak();           /* Line buffering disabled, Pass on everty thing to me */
-    keypad(stdscr, TRUE);       /* I need that nifty F1 */
+    WINDOW *win_commu = subwin(stdscr, row - 8, col, 0, 0);
+    WINDOW *win_state = subwin(stdscr, 3, col, row-8, 0);
+    WINDOW *win_input = subwin(stdscr, 5, col, row-5, 0);
 
-    win_commu = create_newwin(5, 50, 0, 0);
-    win_state = create_newwin(3, 50, 5, 0);
-    win_input = create_newwin(5, 50, 8, 0);
+    box(win_commu, '|', '-');
+    box(win_state, '|', '-');
+    box(win_input, '|', '-');
+    touchwin(stdscr);
 
-    while((ch = getch()) != KEY_F(1)) {
-        
+    mvwprintw(stdscr, 1, 1, "%d", row);
+    mvwprintw(stdscr, 2, 1, "%d", col);
 
-    }
+    wmove(win_input, 1, 1);
+    refresh();
+
+    int a;
+    wscanw(win_input, "%d", &a);
+
+    getch();
+
+    while(1);
+
+    destroy_win(win_commu);
+    destroy_win(win_state);
+    destroy_win(win_input);
 
     endwin();           /* End curses mode        */
     return 0;
-}
-
-WINDOW *create_newwin(int height, int width, int starty, int startx)
-{   
-    WINDOW *local_win;
-
-    local_win = newwin(height, width, starty, startx);
-    box(local_win, 0 , 0);      /* 0, 0 gives default characters 
-                                 * for the vertical and horizontal
-                                 * lines            */
-    wrefresh(local_win);        /* Show that box        */
-
-    return local_win;
 }
 
 void destroy_win(WINDOW *local_win)
