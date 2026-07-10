@@ -7,7 +7,7 @@ extern WINDOW *win_input;
 
 void destroy_win(WINDOW *local_win)
 {  
-    wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+    wclear(local_win);
     wrefresh(local_win);
     delwin(local_win);
 }
@@ -34,4 +34,5 @@ void time_Update(time_t *rawtime, int col)
     struct tm *info = localtime( rawtime );
     wmove(win_state, 1, col-10);
     wprintw(win_state, "%d:%d:%d", info->tm_hour, info->tm_min, info->tm_sec);
+    wrefresh(win_state);
 }
