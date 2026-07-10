@@ -6,11 +6,7 @@ extern WINDOW *win_state;
 extern WINDOW *win_input;
 
 void destroy_win(WINDOW *local_win)
-{   
-    /* box(local_win, ' ', ' '); : This won't produce the desired
-     * result of erasing the window. It will leave it's four corners 
-     * and so an ugly remnant of window. 
-     */
+{  
     wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
     wrefresh(local_win);
     delwin(local_win);
@@ -18,7 +14,8 @@ void destroy_win(WINDOW *local_win)
 
 void change_home(char* path)
 {
-    int a = 1;
+    path = path;
+    return;
 }
 
 void clear_Win_Input(WINDOW *win_input)

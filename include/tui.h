@@ -1,7 +1,12 @@
 #ifndef TUI_H
 #define TUI_H
 
-#include "main.h"
+#include <ncurses.h>
+#include <time.h>
+#include<unistd.h>
+#include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 
 void destroy_win(WINDOW *local_win);  //销毁窗口
 void change_home(char* path); //将读取地址的home替换成~

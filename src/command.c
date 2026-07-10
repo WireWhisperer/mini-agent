@@ -1,4 +1,4 @@
-#include "input.h"
+#include "command.h"
 
 extern WINDOW *win_commu_box;
 extern WINDOW *win_commu_data;
@@ -19,7 +19,7 @@ void react_to_input(char* buffer)
     }
     else if ((ptr = strstr(buffer, "/read"))) 
     {
-        commond_Read(buffer,ptr);
+        commond_Read(ptr);
     }
     else
     {
@@ -28,11 +28,11 @@ void react_to_input(char* buffer)
     }
 }
 
-void commond_Read(char* buffer, char* ptr)
+void commond_Read(char* ptr)
 {
     ptr += 6; 
     char file_addr[50];  //存储文件地址
-    bool file_addr_flag = true;
+    //bool file_addr_flag = true;
     int row_read;  //存储读取的行数
     bool row_read_flag = true;
     int row_true;  //存储实际读取的行数
@@ -98,8 +98,9 @@ void commond_Read(char* buffer, char* ptr)
                 waddch(win_commu_data, flag);
                 if (read_row_num > row_read && row_read_flag) break;
                 if(flag == '\n') read_row_num++;
+                refresh();
             }
-            wrefresh(win_commu_data);
+            
         }
         fclose(file);
     }

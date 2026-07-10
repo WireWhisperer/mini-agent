@@ -11,10 +11,10 @@ int main(void)
     start_color();
     
     int row,col;    //保存当前主窗口大小
-    int curse_row,curse_col; //保存当前光标位置
     char cwd[1024]; //记录当前地址
     char buffer[1024]; //记录输入缓冲区
     time_t rawtime;  //记录当前时间
+    getmaxyx(stdscr,row,col); //获取当前窗口大小
     
     init_tui(row, col);
 
@@ -23,7 +23,7 @@ int main(void)
     getcwd(cwd, sizeof(cwd));
     change_home(cwd);
 
-    init_pair(1, COLOR_GREEN, COLOR_BLACK);  // [黑]底[白]字
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);  
     wattron(win_state, COLOR_PAIR(1));                 
     wprintw(win_state, "%s", cwd);
     wattroff(win_state, COLOR_PAIR(1));                  // 关闭颜色设置，恢复默认
@@ -41,11 +41,11 @@ int main(void)
     while(1)
     {
         time_Update(&rawtime, col); //更新时间
-        wscanw(win_input, "%s", buffer);
+        wscanw(win_input, "%[^\n]", buffer);
 
         //打印输入内容
         wprintw(win_commu_data, "user: \n%s\n\n", buffer);
-        wrefresh(win_commu_data);
+        refresh();
         //处理输入内容
         react_to_input(buffer);
         clear_Win_Input(win_input);
