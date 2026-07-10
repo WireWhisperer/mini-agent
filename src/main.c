@@ -3,9 +3,17 @@
 #include <time.h>
 #include<unistd.h>
 #include <string.h>
+#include <signal.h>
+#include <stdlib.h>
 
 void destroy_win(WINDOW *local_win);
 void change_home(char* path); //将读取地址的home替换成~
+void Get_CtrlC_handler(int sig); //捕捉Ctrl-C信号
+void clear_Win_Input(WINDOW *win_input); //清空输入窗口
+
+WINDOW *win_commu;
+WINDOW *win_state;
+WINDOW *win_input;
 
 int main(int argc, char *argv[])
 {
@@ -20,9 +28,9 @@ int main(int argc, char *argv[])
     getmaxyx(stdscr, row, col);
     
     //创建三个子窗口
-    WINDOW *win_commu = subwin(stdscr, row - 8, col, 0, 0);
-    WINDOW *win_state = subwin(stdscr, 3, col, row-8, 0);
-    WINDOW *win_input = subwin(stdscr, 5, col, row-5, 0);
+    win_commu = subwin(stdscr, row - 8, col, 0, 0);
+    win_state = subwin(stdscr, 3, col, row-8, 0);
+    win_input = subwin(stdscr, 5, col, row-5, 0);
     //画框框
     box(win_commu, '|', '-');
     box(win_state, '|', '-');
@@ -46,26 +54,31 @@ int main(int argc, char *argv[])
     wprintw(win_state, "%d:%d:%d", info->tm_hour, info->tm_min, info->tm_sec);
 
     touchwin(win_state);  
-    //光标移动到输入窗口
-    wmove(win_input, 1, 1);
-    wprintw(win_input, ">");
-    wmove(win_input, 1, 2);
-    refresh();
 
+    //光标移动到输入窗口
+    clear_Win_Input(win_input);
+
+    signal(SIGINT, Get_CtrlC_handler);
 
     while(1)
     {
         wscanw(win_input, "%s", buffer);
-        wclear(win_input);
-        box(win_input, '|', '-');
-        wmove(win_input, 1, 1);
-        wprintw(win_input, ">");
-        wmove(win_input, 1, 2);
-        refresh();
+
+        //打印输入内容
+        wmove(win_commu, 1, 1);
+        wprintw(win_commu, "%s", buffer);
+        wrefresh(win_commu);
+        //处理输入内容
+        if (!strcmp(buffer, "/exit")) 
+        {
+            destroy_win(win_commu);
+            destroy_win(win_state);
+            destroy_win(win_input);
+            endwin();
+            exit(0);
+        }
+        clear_Win_Input(win_input);
     }
-    
-
-
 
     destroy_win(win_commu);
     destroy_win(win_state);
@@ -89,4 +102,21 @@ void destroy_win(WINDOW *local_win)
 void change_home(char* path)
 {
     int a = 1;
+}
+
+void Get_CtrlC_handler(int sig) 
+{
+	signal(sig, SIG_IGN);
+    clear_Win_Input(win_input);
+
+}
+
+void clear_Win_Input(WINDOW *win_input)
+{
+    wclear(win_input);
+    box(win_input, '|', '-');
+    wmove(win_input, 1, 1);
+    wprintw(win_input, ">");
+    wmove(win_input, 1, 2);
+    refresh();
 }
