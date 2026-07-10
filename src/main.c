@@ -13,7 +13,8 @@ void clear_Win_Input(WINDOW *win_input); //清空输入窗口
 void time_Update(time_t *rawtime, int col); //更新时间
 void react_to_input(char* buffer, int *Win_Commu_Pos); //处理输入内容
 
-WINDOW *win_commu;
+WINDOW *win_commu_box;
+WINDOW *win_commu_data;
 WINDOW *win_state;
 WINDOW *win_input;
 
@@ -31,16 +32,17 @@ int main(void)
     getmaxyx(stdscr, row, col);
     
     //创建三个子窗口
-    win_commu = subwin(stdscr, row - 8, col, 0, 0);
+    win_commu_box = subwin(stdscr, row - 8, col, 0, 0);
+    win_commu_data = subwin(stdscr, row - 10, col-2, 1, 1);
     win_state = subwin(stdscr, 3, col, row-8, 0);
     win_input = subwin(stdscr, 5, col, row-5, 0);
     //画框框
-    box(win_commu, '|', '-');
+    box(win_commu_box, '|', '-');
     box(win_state, '|', '-');
     box(win_input, '|', '-');
     
-    scrollok(win_commu, true);        // 在 WIN 指针指向的窗口中开启 (true)/关闭 (false) 滚屏
-    wsetscrreg(win_commu, 1, getmaxy(win_commu) - 2);      // 在 scrollok 开启后，可以在窗口中设立一个滚屏区，在该区域内有滚屏
+    scrollok(win_commu_data, true);        // 在 WIN 指针指向的窗口中开启 (true)/关闭 (false) 滚屏
+    wsetscrreg(win_commu_data, 0, getmaxy(win_commu_data));      // 在 scrollok 开启后，可以在窗口中设立一个滚屏区，在该区域内有滚屏
                                  // 滚屏区从第 [x] 行开始，共占 [line] 行
 
     //显示当前路径和时间
@@ -69,15 +71,16 @@ int main(void)
         wscanw(win_input, "%s", buffer);
 
         //打印输入内容
-        wmove(win_commu, curse_row, curse_col+1);
-        wprintw(win_commu, "user: %s", buffer);
-        wrefresh(win_commu);
+        //wmove(win_commu_data, curse_row, curse_col+1);
+        wprintw(win_commu_data, "user: \n%s\n\n", buffer);
+        wrefresh(win_commu_data);
         //处理输入内容
         react_to_input(buffer, &Win_Commu_Pos);
         clear_Win_Input(win_input);
     }
 
-    destroy_win(win_commu);
+    destroy_win(win_commu_box);
+    destroy_win(win_commu_data);
     destroy_win(win_state);
     destroy_win(win_input);
 
@@ -130,7 +133,8 @@ void react_to_input(char* buffer, int *Win_Commu_Pos)
 {
     if (!strcmp(buffer, "/exit")) 
     {
-        destroy_win(win_commu);
+        destroy_win(win_commu_box);
+        destroy_win(win_commu_data);
         destroy_win(win_state);
         destroy_win(win_input);
         endwin();
@@ -139,7 +143,7 @@ void react_to_input(char* buffer, int *Win_Commu_Pos)
     else
     {
         //wmove(win_commu, *Win_Commu_Pos, 1);
-        wprintw(win_commu, "Assistant:\n ## `429` Too many Requests\n\n**The server is busy, please try again later.**\n\n");
-        wrefresh(win_commu);
+        wprintw(win_commu_data, "Assistant:\n ## `429` Too many Requests\n\n**The server is busy, please try again later.**\n\n");
+        wrefresh(win_commu_data);
     }
 }
