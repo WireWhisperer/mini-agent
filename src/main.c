@@ -41,6 +41,7 @@ int main(void)
     while(1)
     {
         time_Update(&rawtime, col); //更新时间
+        refresh();
         wscanw(win_input, "%[^\n]", buffer);
 
         //打印输入内容
